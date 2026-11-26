@@ -1,0 +1,17 @@
+[project]
+name = "satusehat-fhir-monitor"
+version = "0.2.0"
+description = "Reverse-proxy sidecar and terminal UI to inspect SATUSEHAT (FHIR R4) API traffic during development."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = []          # standard library only
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Operating System :: POSIX",
+  "Topic :: Software Development :: Debuggers",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests"]

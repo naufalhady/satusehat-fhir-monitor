@@ -1,0 +1,48 @@
+[Unit]
+Description=SATUSEHAT Reverse Proxy Sidecar (FHIR Monitor Logger)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# Use a dedicated unprivileged account, e.g.:  useradd --system --no-create-home --shell /usr/sbin/nologin satusehat-monitor
+# Add admins who must read logs over SSH to this account's group and set SATUSEHAT_LOG_FILE_MODE=640.
+User=satusehat-monitor
+Group=satusehat-monitor
+WorkingDirectory=/opt/satusehat-monitor
+Environment="SATUSEHAT_PROXY_HOST=127.0.0.1"
+Environment="SATUSEHAT_PROXY_PORT=8999"
+Environment="SATUSEHAT_UPSTREAM_URL=https://api-satusehat.dto.kemkes.go.id"
+Environment="SATUSEHAT_LOG_DIR=/var/lib/satusehat-monitor/logs"
+Environment="SATUSEHAT_UPSTREAM_TIMEOUT=30"
+Environment="SATUSEHAT_RETENTION_DAYS=14"
+# auto = mask personal data in logs when upstream is production. Set to "off" only on staging/dev.
+Environment="SATUSEHAT_MASK_PII=auto"
+ExecStart=/usr/bin/python3 /opt/satusehat-monitor/src/proxy.py
+Restart=always
+RestartSec=2
+LimitNOFILE=65535
+
+# --- hardening ---
+StateDirectory=satusehat-monitor
+StateDirectoryMode=0700
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/satusehat-monitor
+
+[Install]
+WantedBy=multi-user.target
